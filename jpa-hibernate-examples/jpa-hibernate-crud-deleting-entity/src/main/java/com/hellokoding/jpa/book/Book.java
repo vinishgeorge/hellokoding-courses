@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @RequiredArgsConstructor
@@ -17,7 +20,16 @@ public class Book{
     private int id;
 
     private @NonNull String name;
+    
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Publisher> publishers;
 
+    public Book(String name, Publisher... publishers) {
+        this.name = name;
+        this.publishers = Stream.of(publishers).collect(Collectors.toSet());
+        this.publishers.forEach(x -> x.setBook(this));
+    }
+    
     @ManyToOne
     @JoinColumn
     private Category category;
